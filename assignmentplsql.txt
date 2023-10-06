@@ -1,0 +1,286 @@
+Assignments(PLSQL)
+1. Write a procedure for the following.
+a. To accept employee number , delete the record of the given
+employee.
+SQL>  create or replace procedure delrec(eno in number) as
+  2  begin
+  3  delete from emp where empno=eno;
+  4  end;
+  5  /
+
+Procedure created.
+
+SQL> select * from emp;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 09-DEC-82       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7876 ADAMS      CLERK           7788 12-JAN-83       1100                    20
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+
+14 rows selected.
+
+SQL> execute delrec(7369)
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from emp;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 09-DEC-82       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7876 ADAMS      CLERK           7788 12-JAN-83       1100                    20
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+
+13 rows selected.
+
+
+b. To accept grade,losal and hisal and insert a record into
+salgrad table
+
+  1  create or replace procedure insertrec(grade number, hisal number, losal number)as begin
+  2  insert into salgrade values(grade,hisal,losal);
+  3* end;
+SQL> /
+
+Procedure created.
+
+SQL> variable grade number
+SQL> variable hisal number
+SQL> variable losal number
+SQL> execute insertrec(7,1600,3000)
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from salgrade;
+
+     GRADE      LOSAL      HISAL
+---------- ---------- ----------
+         1        700       1200
+         2       1201       1400
+         3       1401       2000
+         4       2001       3000
+         5       3001       9999
+         7       1600       3000
+
+6 rows selected.
+
+
+2. Write functions to perform the following.
+a. Calculate experience of the employee
+ 1  create or replace function cal(hiredate date) return int
+  2  as
+  3  begin
+  4  return floor(months_between(sysdate,hiredate)/12);
+  5* end;
+SQL> /
+
+Function created.
+SQL> select empno,ename,hiredate, cal(hiredate) from emp;
+
+     EMPNO ENAME      HIREDATE  CAL(HIREDATE)
+---------- ---------- --------- -------------
+      7369 SMITH      17-DEC-80            42
+      7499 ALLEN      20-FEB-81            42
+      7521 WARD       22-FEB-81            42
+      7566 JONES      02-APR-81            42
+      7654 MARTIN     28-SEP-81            42
+      7698 BLAKE      01-MAY-81            42
+      7782 CLARK      09-JUN-81            42
+      7788 SCOTT      09-DEC-82            40
+      7839 KING       17-NOV-81            41
+      7844 TURNER     08-SEP-81            42
+      7876 ADAMS      12-JAN-83            40
+      7900 JAMES      03-DEC-81            41
+      7902 FORD       03-DEC-81            41
+      7934 MILLER     23-JAN-82            41
+
+14 rows selected.
+b. Ti calculate net sal by using formula.
+Netsal=sal+da+hra-pf+comm
+Da-→ 10% sal hra→ 15% sal pf --→ 8 % of sal
+
+
+  1  create or replace function netsal(sal number, comm number) return int as
+  2  netsal number:=0;
+  3  begin
+  4  netsal:=sal+0.10*sal+0.15*sal+0.08*sal+nvl(comm,0);
+  5  return netsal;
+  6* end;
+SQL> /
+
+Function created.
+
+SQL> select ename,empno,sal,job,comm,netsal(sal,comm) from emp;
+
+ENAME           EMPNO        SAL JOB             COMM NETSAL(SAL,COMM)
+---------- ---------- ---------- --------- ---------- ----------------
+ALLEN            7499       1600 SALESMAN         300             2428
+WARD             7521       1250 SALESMAN         500             2163
+JONES            7566       2975 MANAGER                          3957
+MARTIN           7654       1250 SALESMAN        1400             3063
+BLAKE            7698       2850 MANAGER                          3791
+CLARK            7782       2450 MANAGER                          3259
+SCOTT            7788       3000 ANALYST                          3990
+KING             7839       5000 PRESIDENT                        6650
+TURNER           7844       1500 SALESMAN           0             1995
+ADAMS            7876       1100 CLERK                            1463
+JAMES            7900        950 CLERK                            1264
+FORD             7902       3000 ANALYST                          3990
+MILLER           7934       1300 CLERK                            1729
+iacsd               1       8000 CLERK            700            11340
+
+14 rows selected.
+1. Print the following patterns using loop :
+a.
+*
+**
+***
+****
+
+  1  declare
+  2  num number:=&n;
+  3  i number;
+  4  j number;
+  5  begin
+  6  for i in 1..num
+  7  loop
+  8  for j in 1..i
+  9  loop
+ 10  DBMS_OUTPUT.PUT('*');
+ 11  end loop;
+ 12  DBMS_OUTPUT.NEW_LINE;
+ 13  end loop;
+ 14* end;
+SQL> /
+Enter value for n: 5
+old   2: num number:=&n;
+new   2: num number:=5;
+*
+**
+***
+****
+*****
+
+PL/SQL procedure successfully completed.
+
+
+b.
+  *
+ ***
+*****
+ ***
+  *
+
+  1  create or replace procedure diamond(n number)
+  2   as
+  3  str varchar2(10):='';
+  4  cnt number:=2;
+  5  scnt number;
+  6  begin
+  7  scnt:=floor(n/2);
+  8  DBMS_OUTPUT.PUT_LINE('test11'|| str);
+  9  loop
+ 10  str:=lpad(' ' ,cnt,'*');
+ 11  str:=concat(lpad(' ',scnt,' '),str);
+ 12  DBMS_OUTPUT.PUT_LINE(str);
+ 13  cnt:=cnt+2;
+ 14  scnt := scnt-1;
+ 15  exit when cnt >n+1;
+ 16  end loop;
+ 17  cnt :=n-1;
+ 18  scnt:=1;
+ 19  loop
+ 20  str:=lpad(' ',cnt,'*');
+ 21  str:=concat(lpad(' ',scnt,' '),str);
+ 22  DBMS_OUTPUT.PUT_LINE(str);
+ 23  cnt:=cnt-2;
+ 24  scnt:=scnt+1;
+ 25  exit when cnt<2;
+ 26  end loop;
+ 27* end;
+SQL> /
+
+SQL> set serveroutput on format truncated
+SQL> execute diamond(7)
+test11
+   *
+  ***
+ *****
+*******
+ *****
+  ***
+   *
+
+PL/SQL procedure successfully completed.
+
+c.
+1010101
+10101
+101
+1
+d.
+1
+1 2
+1 2 3
+1 2 3 4
+1 2 3 4 5
+
+
+  1  declare
+  2  num number:=&n;
+  3  i number;
+  4  j number;
+  5  begin
+  6  for i in 1..num
+  7  loop
+  8  for j in 1..i
+  9  loop
+ 10  DBMS_OUTPUT.PUT(j);
+ 11  end loop;
+ 12  DBMS_OUTPUT.NEW_LINE;
+ 13  end loop;
+ 14* end;
+SQL> /
+Enter value for n: 6
+old   2: num number:=&n;
+new   2: num number:=6;
+1
+12
+123
+1234
+12345
+123456
+
+PL/SQL procedure successfully completed.
+
+3. Write trigger on employee table for insert, update and delete, make
+appropriate entries in following table.
+Create table emp_check(
+Empid number;
+Ename varchar2(20),
+Oldsal number(9,2),
+Newsal number(9,2),
+Uname varchar2(20),
+Chk_date date);
